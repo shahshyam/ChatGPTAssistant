@@ -17,18 +17,19 @@ namespace AssistantForWord
     {
         private Office.IRibbonUI ribbon;
         private bool isPressed;
-        private string cacheRibbonId;
+        private string selectedButtonId = "toggleButton1";
+        private List<string> toggleButtonIds;
         private List<PromptDetail> promptDetails;
         private readonly string btnTemplate = @"<button id=""{0}"" tag=""{1}"" label=""{1}"" onAction=""GetSelectedText"" getVisible=""GetSubMenuVisible""/>";
         public CustomRibbonExplorer()
         {
+           toggleButtonIds= new List<string>() { "toggleButton1" , "toggleButton2" , "toggleButton3" };
         }
 
         #region IRibbonExtensibility Members
 
         public string GetCustomUI(string ribbonID)
         {
-            cacheRibbonId = ribbonID;
             string ribbonUIContent = GetResourceText("AssistantForWord.CustomRibbonExplorer.xml");
             var config = ProcessData.GetData();
             var sb = new StringBuilder();
@@ -72,10 +73,7 @@ namespace AssistantForWord
         {
             return isPressed;
         } 
-        public void ReloadCustomUI()
-        {
-            GetCustomUI(cacheRibbonId);
-        }
+        
         public void InvalidateControl(string controlId)
         {
             ribbon.InvalidateControl(controlId);
@@ -101,6 +99,34 @@ namespace AssistantForWord
             }
             return false;
         }
+        public bool GroupGetPressed(Office.IRibbonControl control)
+        {
+            return selectedButtonId == control.Id;
+        }
+
+        public void ToggleButton_Click(Office.IRibbonControl control, bool isPressed)
+        {
+            // Handle the click event
+            if (isPressed)
+            {
+                selectedButtonId = control.Id;
+                // Deselect all other buttons
+                DeselectAllButtonsExcept(control.Id);
+            }
+        }        
+
+        private void DeselectAllButtonsExcept(string buttonId)
+        {
+            //Deselect all buttons except the selected one
+            foreach (var id in toggleButtonIds)
+            {
+                if (selectedButtonId == id)
+                    continue;
+                ribbon.InvalidateControl(id);
+            }
+            selectedButtonId = buttonId; // Update the selected button
+        }
+
         public void Ribbon_Load(Office.IRibbonUI ribbonUI)
         {
             this.ribbon = ribbonUI;
