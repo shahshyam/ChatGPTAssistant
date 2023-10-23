@@ -14,11 +14,10 @@ namespace AssistantForWord.UI.ViewModels
    public class CustomPanelViewModel:ViewModelBase
     {
         public ObservableCollection<PromptDetail> PromptList { get; set; }
-        private readonly CustomRibbonExplorer customRibbonExplorer;
+
         public CustomPanelViewModel()
         {
-            PromptList = new ObservableCollection<PromptDetail>();
-            customRibbonExplorer = Globals.ThisAddIn.customRibbonExplorer;
+            PromptList = new ObservableCollection<PromptDetail>();            
             LoadExistingData();
         }
         private void LoadExistingData()
@@ -87,6 +86,9 @@ namespace AssistantForWord.UI.ViewModels
                 {
                     var config = ProcessData.GetData();
                     config.APIKEY = this.APIKey;
+                    config.Temperature = Temperature;
+                    config.ModelName = SelectedModelName;
+                    config.TokenSize = TokenSize;
                     ProcessData.SaveData(config);
                     AllowPrompt = true;
                 }, y => { return !string.IsNullOrEmpty(APIKey); }
@@ -161,17 +163,16 @@ namespace AssistantForWord.UI.ViewModels
                 return deletePromptCommand ?? (deletePromptCommand = new RelayCommand((param) =>
                 {
                     if (SelectedPromptDetail != null)
-                    {                               
+                    {
                         var config = ProcessData.GetData();
-                        int index=config.PromptDetailList.FindIndex(x => x.Title == SelectedPromptDetail.Title && x.Description == SelectedPromptDetail.Description);
+                        int index = config.PromptDetailList.FindIndex(x => x.Title == SelectedPromptDetail.Title && x.Description == SelectedPromptDetail.Description);
                         if (index > -1)
                         {
                             config.PromptDetailList.RemoveAt(index);
                             ProcessData.SaveData(config);
                         }
-                       
-                        PromptList.Remove(SelectedPromptDetail);                       
-                        customRibbonExplorer.InvalidateControl("mainAssitant");
+
+                        PromptList.Remove(SelectedPromptDetail);
                     }
                 }
                 ));

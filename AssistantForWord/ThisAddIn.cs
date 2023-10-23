@@ -14,12 +14,12 @@ namespace AssistantForWord
     public partial class ThisAddIn
     {
         private SettingUserControl _settingControl;
-        private Microsoft.Office.Tools.CustomTaskPane myCustomTaskPane;
-        public CustomRibbonExplorer customRibbonExplorer;
+        private Microsoft.Office.Tools.CustomTaskPane myCustomTaskPane;        
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-
+           
         }
+        
         public void ProcessSideBarPanel(bool isVisible)
         {
             if (_settingControl == null)
@@ -37,8 +37,7 @@ namespace AssistantForWord
 
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
-            customRibbonExplorer = new CustomRibbonExplorer();
-            return customRibbonExplorer;
+            return new CustomRibbonExplorer();            
         }
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {

@@ -18,9 +18,8 @@ namespace AssistantForWord
         private Office.IRibbonUI ribbon;
         private bool isPressed;
         private string selectedButtonId = "toggleButton1";
-        private List<string> toggleButtonIds;
-        private List<PromptDetail> promptDetails;
-        private readonly string btnTemplate = @"<button id=""{0}"" tag=""{1}"" label=""{1}"" onAction=""GetSelectedText"" getVisible=""GetSubMenuVisible""/>";
+        private List<string> toggleButtonIds;        
+        private readonly string btnTemplate = @"<button id=""{0}"" tag=""{1}"" label=""{1}"" onAction=""GetSelectedText"" imageMso=""SignatureLineInsert""/>";
         public CustomRibbonExplorer()
         {
            toggleButtonIds= new List<string>() { "toggleButton1" , "toggleButton2" , "toggleButton3" };
@@ -30,23 +29,7 @@ namespace AssistantForWord
 
         public string GetCustomUI(string ribbonID)
         {
-            string ribbonUIContent = GetResourceText("AssistantForWord.CustomRibbonExplorer.xml");
-            var config = ProcessData.GetData();
-            var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(config.APIKEY))
-            {
-                promptDetails = config.PromptDetailList;
-                foreach (var promot in config.PromptDetailList)
-                {
-                    string Id = GetIdString();
-                    sb.Append(string.Format(btnTemplate, Id, promot.Title));
-                }
-                if (sb.Length > 0)
-                {
-                    int index = ribbonUIContent.LastIndexOf("</menu>");
-                    ribbonUIContent = ribbonUIContent.Insert(index, sb.ToString());
-                }
-            }
+            string ribbonUIContent = GetResourceText("AssistantForWord.CustomRibbonExplorer.xml");            
             return ribbonUIContent;
         }
         #endregion
@@ -57,10 +40,16 @@ namespace AssistantForWord
         {
             if (control != null)
             {
+                var application = Globals.ThisAddIn.Application;
+                var oldStatus = application.DisplayStatusBar;
+                application.DisplayStatusBar = true;
+                application.StatusBar = "Assistant is processing request";
                 string prompt = control.Tag as string;
                 string selectedText = WordDocumentHelper.GetSelectedText();
                 var result = await OpenAIClient.GetResponse($"{prompt}:{selectedText}");
-                WordDocumentHelper.InsertTextAfterSelection(result);
+                WordDocumentHelper.InsertTextAfterSelection(result, selectedButtonId);
+                application.DisplayStatusBar = false;
+                application.DisplayStatusBar = oldStatus;
             }
            
         }
@@ -76,8 +65,7 @@ namespace AssistantForWord
         
         public void InvalidateControl(string controlId)
         {
-            ribbon.InvalidateControl(controlId);
-            promptDetails = null;
+            ribbon.InvalidateControl(controlId);           
         }
         public void ShowSetting(Office.IRibbonControl control, bool isPressed)
         {
@@ -85,20 +73,7 @@ namespace AssistantForWord
             InvalidateControl(control.Id);
             Globals.ThisAddIn.ProcessSideBarPanel(this.isPressed);
         }
-        public bool GetSubMenuVisible(Office.IRibbonControl control)
-        {
-            if (control != null)
-            {
-                string title = control.Tag;
-                if (promptDetails == null)
-                {
-                    var config = ProcessData.GetData();
-                    promptDetails = config.PromptDetailList;
-                }
-                return promptDetails.FindIndex(x => x.Title == title) > -1;
-            }
-            return false;
-        }
+       
         public bool GroupGetPressed(Office.IRibbonControl control)
         {
             return selectedButtonId == control.Id;
@@ -125,6 +100,27 @@ namespace AssistantForWord
                 ribbon.InvalidateControl(id);
             }
             selectedButtonId = buttonId; // Update the selected button
+        }
+
+        public string GetMenuContent(Office.IRibbonControl control)
+        {
+            var config = ProcessData.GetData();
+            bool hasContentAdded = false;
+
+            StringBuilder sb = new StringBuilder(@"<menu xmlns=""http://schemas.microsoft.com/office/2006/01/customui"" >");
+
+            if (!string.IsNullOrEmpty(config.APIKEY) && config.PromptDetailList.Count > 0)
+            {
+                hasContentAdded = true;
+                foreach (var promot in config.PromptDetailList)
+                {
+                    string Id = $"btn{GetIdString()}";
+                    sb.Append(string.Format(btnTemplate, Id, promot.Title));
+                }
+            }
+            if (hasContentAdded)
+                sb.Append(@"</menu>");
+            return sb.ToString();
         }
 
         public void Ribbon_Load(Office.IRibbonUI ribbonUI)

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:helpers="clr-namespace:AssistantForWord.Helpers"
              xmlns:local="clr-namespace:AssistantForWord.UI.Views"
              mc:Ignorable="d" 
              FontFamily="Segoe UI"
@@ -59,7 +60,11 @@
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0">
                     <TextBlock DockPanel.Dock="Top" Text="Open AI Key:"/>
-                    <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding APIKey, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Please enter your API key"/>
+                    <!--<TextBox Visibility="Hidden" mah:ControlsHelper.CornerRadius="5" Text="{Binding APIKey, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Please enter your API key"/>-->
+                    <PasswordBox  mah:ControlsHelper.CornerRadius="5" mah:TextBoxHelper.Watermark="Open AI API Key" Style="{StaticResource MahApps.Styles.PasswordBox.Button.Revealed}" 
+                                  helpers:PasswordBoxHelper.BindPassword="true"
+                    helpers:PasswordBoxHelper.BoundPassword="{Binding APIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>             
+             
                 </DockPanel>
                 <DockPanel Grid.Row="1">
                     <TextBlock DockPanel.Dock="top" Text="Temperatur:"></TextBlock>

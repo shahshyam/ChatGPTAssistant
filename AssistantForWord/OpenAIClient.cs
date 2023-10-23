@@ -18,7 +18,7 @@ namespace AssistantForWord
             var config = ProcessData.GetData();
             if (string.IsNullOrEmpty(config.APIKEY))
                 return string.Empty;
-            var client = new OpenAIAPI("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");
+            var client = new OpenAIAPI(config.APIKEY);
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             var result = await client.Chat.CreateChatCompletionAsync(new ChatRequest()
