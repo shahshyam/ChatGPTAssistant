@@ -13,14 +13,13 @@ namespace AssistantForWord.UI.ViewModels
 {
    public class CustomPanelViewModel:ViewModelBase
     {
-        public ObservableCollection<PromptDetail> PromptList { get; set; }
+        public ObservableCollection<PromptViewModel> PromptList { get; set; }
 
         public CustomPanelViewModel()
         {
-            PromptList = new ObservableCollection<PromptDetail>();            
-            LoadExistingData();
+            PromptList = new ObservableCollection<PromptViewModel>();            
         }
-        private void LoadExistingData()
+        internal void LoadExistingData()
         {
             var config = ProcessData.GetData();
             APIKey = config.APIKEY;
@@ -30,7 +29,13 @@ namespace AssistantForWord.UI.ViewModels
             SelectedModelName = config.ModelName;
             foreach (var prompt in config.PromptDetailList)
             {
-                PromptList.Add(prompt);
+                PromptList.Add(new PromptViewModel()
+                {
+                    Description = prompt.Description,
+                    Title = prompt.Title,
+                    Id = prompt.Id
+                }
+                );
             }
         }
         #region API Setting
@@ -124,12 +129,39 @@ namespace AssistantForWord.UI.ViewModels
             }
         }
 
-        private PromptDetail selectedPromptDetail;
-        public PromptDetail SelectedPromptDetail
+        private PromptViewModel selectedPromptDetail;
+        public PromptViewModel SelectedPromptDetail
         {
             get { return selectedPromptDetail; }
             set { selectedPromptDetail = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool isExpand = false;
+        public bool IsExpand
+        {
+            get { return isExpand; }
+            set
+            {
+                isExpand = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public OperationMode Mode = OperationMode.Add;
+        private ICommand editPromptCommand;
+        public ICommand EditPromptCommand
+        {
+            get
+            {
+                return editPromptCommand ?? (editPromptCommand = new RelayCommand((x) =>
+                {
+                    Title = SelectedPromptDetail.Title;
+                    Description = SelectedPromptDetail.Description;
+                    Mode = OperationMode.Edit;
+                    IsExpand = true;
+                }));
             }
         }
 
@@ -140,17 +172,44 @@ namespace AssistantForWord.UI.ViewModels
             {
                 return savePromptCommand ?? (savePromptCommand = new RelayCommand((x) =>
                 {
-                    var proptdetail = new PromptDetail()
+                    if (Mode == OperationMode.Edit)
                     {
-                        Description = this.Description,
-                        Title = this.Title
-                    };
-                    PromptList.Add(proptdetail);
-                    Description = string.Empty;
-                    Title = string.Empty;
-                    var config = ProcessData.GetData();
-                    config.PromptDetailList.Add(proptdetail);
-                    ProcessData.SaveData(config);                    
+                        Guid id = SelectedPromptDetail.Id;
+                        var selectedItem = PromptList.FirstOrDefault(y => y.Id == id);
+                        selectedItem.Title = this.Title;
+                        selectedItem.Description = this.Description;
+                        var config = ProcessData.GetData();
+                        int index = config.PromptDetailList.FindIndex(z => z.Id == id);
+                        if (index > -1)
+                        {
+                            config.PromptDetailList[index].Title = Title;
+                            config.PromptDetailList[index].Description = Description;
+                            ProcessData.SaveData(config);
+                        }
+                        IsExpand = false;
+                    }
+                    else
+                    {
+                        var promptVM = new PromptViewModel()
+                        {
+                            Description = this.Description,
+                            Title = this.Title
+                        };
+                        var proptdetail = new PromptDetail()
+                        {
+                            Description = this.Description,
+                            Title = this.Title,
+                            Id = promptVM.Id
+                        };
+                        PromptList.Add(promptVM);
+                        Description = string.Empty;
+                        Title = string.Empty;
+
+                        var config = ProcessData.GetData();
+                        config.PromptDetailList.Add(proptdetail);
+                        ProcessData.SaveData(config);
+                    }
+                    Mode = OperationMode.Add;                   
                 }, y => { return !string.IsNullOrEmpty(Title) && !string.IsNullOrEmpty(Description); }
                 ));
             }
@@ -162,16 +221,15 @@ namespace AssistantForWord.UI.ViewModels
             {
                 return deletePromptCommand ?? (deletePromptCommand = new RelayCommand((param) =>
                 {
-                    if (SelectedPromptDetail != null)
+                    if (Mode == OperationMode.Add && SelectedPromptDetail != null)
                     {
                         var config = ProcessData.GetData();
-                        int index = config.PromptDetailList.FindIndex(x => x.Title == SelectedPromptDetail.Title && x.Description == SelectedPromptDetail.Description);
+                        int index = config.PromptDetailList.FindIndex(x => x.Id == SelectedPromptDetail.Id);
                         if (index > -1)
                         {
                             config.PromptDetailList.RemoveAt(index);
                             ProcessData.SaveData(config);
                         }
-
                         PromptList.Remove(SelectedPromptDetail);
                     }
                 }
@@ -179,5 +237,10 @@ namespace AssistantForWord.UI.ViewModels
             }
         }
         #endregion
+    }
+    public enum OperationMode
+    {
+        Edit,
+        Add
     }
 }

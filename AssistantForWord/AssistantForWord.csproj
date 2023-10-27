@@ -247,6 +247,7 @@
       <DependentUpon>SettingUserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\ViewModels\CustomPanelViewModel.cs" />
+    <Compile Include="UI\ViewModels\PromptViewModel.cs" />
     <Compile Include="UI\ViewModels\ViewModelBase.cs" />
     <Compile Include="UI\Views\CustomPanelView.xaml.cs">
       <DependentUpon>CustomPanelView.xaml</DependentUpon>

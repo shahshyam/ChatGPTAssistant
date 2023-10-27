@@ -4,15 +4,14 @@
 		<tabs>
 			<tab id="Assistant" label="AI Assistant">
 				<group id="MyGroup"
-					   label="My Group">
-					<button id="chatgpt" size="large" label="ChatGPT"/>
+					   label="My Group">					
 					<toggleButton  id="btnPanel" label="Settings" getPressed="GetPressed" size="large" onAction="ShowSetting"/>
 					<separator/>
 				</group>				
 				<group id="group1" label="Selected Text Option" >
-					<toggleButton id="toggleButton1" label="Insert After" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
-					<toggleButton id="toggleButton2" label="Replace" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
-					<toggleButton id="toggleButton3" label="Insert on Location" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleInsertAfter" label="Insert After" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleReplace" label="Replace" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleInsertOnLocation" label="Insert on Location" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
 				</group>
 			</tab>
 		</tabs>

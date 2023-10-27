@@ -106,29 +106,43 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>                   
-                    <DataGridTemplateColumn Header="Action" Width="80">
+                    <DataGridTemplateColumn Header="Action" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Del" Padding="5,3" Width="40" Height="30" Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid},Path=DataContext.DeletePromptCommand}" CommandParameter="{Binding}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Style.Resources>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="CornerRadius" Value="5"></Setter>
-                                                </Style>
-                                            </Style.Resources>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Edit" Margin="5,0,0,0" Padding="5,3" Width="40" Height="30" Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid},Path=DataContext.EditPromptCommand}" CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="5"></Setter>
+                                                    </Style>
+                                                </Style.Resources>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="Del" Margin="5,0,0,0" Padding="5,3" Width="40" Height="30" Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid},Path=DataContext.DeletePromptCommand}" CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="5"></Setter>
+                                                    </Style>
+                                                </Style.Resources>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>                                                                     
+                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-            
-            <Expander Header="Prompt Setting" Grid.Row="0" Margin="0,5">
+
+            <Expander Header="Prompt Setting" Grid.Row="0" Margin="0,5" IsExpanded="{Binding IsExpand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
@@ -141,7 +155,11 @@
                         <TextBlock DockPanel.Dock="Top" Text="Description:"/>
                         <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding Description,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt decription"></TextBox>
                     </DockPanel>
-                    <Button Grid.Row="2" Content="Save Prompt"  Width="120" Command="{Binding SavePromptCommand}"></Button>
+                    <DockPanel Grid.Row="2">
+                        <TextBlock DockPanel.Dock="Top" Text="Prompt:"/>
+                        <TextBox  AcceptsReturn="True" Height="100" mah:ControlsHelper.CornerRadius="5" Text="{Binding PromptName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt"></TextBox>
+                    </DockPanel>
+                    <Button Grid.Row="3" Content="Save Prompt"  Width="120" Command="{Binding SavePromptCommand}"></Button>
                 </Grid>
             </Expander>
         </Grid>

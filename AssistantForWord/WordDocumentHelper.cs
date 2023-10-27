@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace AssistantForWord
@@ -24,13 +26,13 @@ namespace AssistantForWord
             Word.Selection wordSelection = Globals.ThisAddIn.Application.Selection;
             switch(selectedPosition)
             {
-                case "toggleButton1":
+                case "btnToggleInsertAfter":
                     wordSelection.InsertAfter(Environment.NewLine + message);
                     break;
-                case "toggleButton2":
+                case "btnToggleReplace":
                     ReplaceSelectedText(message);
                     break;
-                case "toggleButton3":
+                case "btnToggleInsertOnLocation":
                     InsertOnSelectedLocation(Environment.NewLine + message);
                     break;
             }
@@ -41,7 +43,7 @@ namespace AssistantForWord
             Word.Application application = Globals.ThisAddIn.Application;
             if (application.Selection != null && application.Selection.Type == Word.WdSelectionType.wdSelectionNormal)
             {
-                string selectedText = application.Selection.Text;
+                string selectedText = application.Selection.Text;                
                 if (!string.IsNullOrEmpty(selectedText))
                     application.Selection.Text = updatedText;
             }
@@ -49,9 +51,11 @@ namespace AssistantForWord
 
         private static void InsertOnSelectedLocation(string updatedText)
         {
-            Word.Application application = Globals.ThisAddIn.Application;
-            Word.Document document = application.ActiveDocument;          
-         
+            Thread thread = new Thread(() => Clipboard.SetText(updatedText));
+            thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread.Start();
+            thread.Join();
+            MessageBox.Show("Please paste result on selected location", "AI Assistant", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

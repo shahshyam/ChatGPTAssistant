@@ -17,12 +17,14 @@ namespace AssistantForWord
     {
         private Office.IRibbonUI ribbon;
         private bool isPressed;
-        private string selectedButtonId = "toggleButton1";
+        private bool isFirstTimeDisplay;
+        public  const string defaultInsertion = "btnToggleInsertAfter";
+        private string selectedButtonId = defaultInsertion;
         private List<string> toggleButtonIds;        
         private readonly string btnTemplate = @"<button id=""{0}"" tag=""{1}"" label=""{1}"" onAction=""GetSelectedText"" imageMso=""SignatureLineInsert""/>";
         public CustomRibbonExplorer()
         {
-           toggleButtonIds= new List<string>() { "toggleButton1" , "toggleButton2" , "toggleButton3" };
+           toggleButtonIds= new List<string>() { "btnToggleInsertAfter", "btnToggleReplace", "btnToggleInsertOnLocation" };
         }
 
         #region IRibbonExtensibility Members
@@ -76,6 +78,8 @@ namespace AssistantForWord
        
         public bool GroupGetPressed(Office.IRibbonControl control)
         {
+            if (!isFirstTimeDisplay)
+                return false;
             return selectedButtonId == control.Id;
         }
 
@@ -88,10 +92,16 @@ namespace AssistantForWord
                 // Deselect all other buttons
                 DeselectAllButtonsExcept(control.Id);
             }
+            else
+            {
+                //default value restore
+                selectedButtonId = defaultInsertion;
+            }
         }        
 
         private void DeselectAllButtonsExcept(string buttonId)
         {
+            isFirstTimeDisplay = true;
             //Deselect all buttons except the selected one
             foreach (var id in toggleButtonIds)
             {

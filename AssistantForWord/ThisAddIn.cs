@@ -14,7 +14,9 @@ namespace AssistantForWord
     public partial class ThisAddIn
     {
         private SettingUserControl _settingControl;
-        private Microsoft.Office.Tools.CustomTaskPane myCustomTaskPane;        
+        private Microsoft.Office.Tools.CustomTaskPane myCustomTaskPane;
+        public delegate void RefreshSidebarPanel();
+        public event RefreshSidebarPanel OnRefreshSidebarPanel;
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
            
@@ -32,9 +34,13 @@ namespace AssistantForWord
                 myCustomTaskPane.DockPositionRestrict = MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoChange;              
                 myCustomTaskPane.Width = 400;
             }
+            if (isVisible)
+            {
+                OnRefreshSidebarPanel?.Invoke();
+            }
             myCustomTaskPane.Visible = isVisible;
-        }       
-
+        }
+       
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
             return new CustomRibbonExplorer();            
