@@ -21,6 +21,8 @@ namespace AssistantForWord.UI.ViewModels
         }
         internal void LoadExistingData()
         {
+            if (PromptList.Count > 0)
+                PromptList.Clear();
             var config = ProcessData.GetData();
             APIKey = config.APIKEY;
             AllowPrompt = !string.IsNullOrEmpty(APIKey);
@@ -33,7 +35,8 @@ namespace AssistantForWord.UI.ViewModels
                 {
                     Description = prompt.Description,
                     Title = prompt.Title,
-                    Id = prompt.Id
+                    Id = prompt.Id,
+                    PromptName = prompt.Name
                 }
                 );
             }
@@ -112,19 +115,14 @@ namespace AssistantForWord.UI.ViewModels
 
         #endregion
         #region PROMPT
-        private string title;
-        public string Title
+        
+        private PromptViewModel newPromptDetail = new PromptViewModel();
+        public PromptViewModel NewPromptDetail
         {
-            get { return title; }
-            set { title = value;
-                OnPropertyChanged();
-            }
-        }
-        private string description;
-        public string Description
-        {
-            get { return description; }
-            set { description = value;
+            get { return newPromptDetail; }
+            set
+            {
+                newPromptDetail = value;
                 OnPropertyChanged();
             }
         }
@@ -157,8 +155,7 @@ namespace AssistantForWord.UI.ViewModels
             {
                 return editPromptCommand ?? (editPromptCommand = new RelayCommand((x) =>
                 {
-                    Title = SelectedPromptDetail.Title;
-                    Description = SelectedPromptDetail.Description;
+                    NewPromptDetail = SelectedPromptDetail;
                     Mode = OperationMode.Edit;
                     IsExpand = true;
                 }));
@@ -176,41 +173,44 @@ namespace AssistantForWord.UI.ViewModels
                     {
                         Guid id = SelectedPromptDetail.Id;
                         var selectedItem = PromptList.FirstOrDefault(y => y.Id == id);
-                        selectedItem.Title = this.Title;
-                        selectedItem.Description = this.Description;
+
+                        selectedItem = NewPromptDetail;
                         var config = ProcessData.GetData();
                         int index = config.PromptDetailList.FindIndex(z => z.Id == id);
                         if (index > -1)
                         {
-                            config.PromptDetailList[index].Title = Title;
-                            config.PromptDetailList[index].Description = Description;
+                            config.PromptDetailList[index].Title = NewPromptDetail.Title;
+                            config.PromptDetailList[index].Description = NewPromptDetail.Description;
+                            config.PromptDetailList[index].Name = NewPromptDetail.PromptName;
                             ProcessData.SaveData(config);
                         }
                         IsExpand = false;
+                        SelectedPromptDetail = null;
                     }
                     else
                     {
-                        var promptVM = new PromptViewModel()
-                        {
-                            Description = this.Description,
-                            Title = this.Title
-                        };
                         var proptdetail = new PromptDetail()
                         {
-                            Description = this.Description,
-                            Title = this.Title,
-                            Id = promptVM.Id
+                            Description = NewPromptDetail.Description,
+                            Title = NewPromptDetail.Title,
+                            Id = NewPromptDetail.Id,
+                            Name = NewPromptDetail.PromptName
                         };
-                        PromptList.Add(promptVM);
-                        Description = string.Empty;
-                        Title = string.Empty;
-
+                        PromptList.Add(NewPromptDetail);
                         var config = ProcessData.GetData();
                         config.PromptDetailList.Add(proptdetail);
                         ProcessData.SaveData(config);
                     }
-                    Mode = OperationMode.Add;                   
-                }, y => { return !string.IsNullOrEmpty(Title) && !string.IsNullOrEmpty(Description); }
+                    NewPromptDetail = new PromptViewModel();
+                    Mode = OperationMode.Add;
+                }, y =>
+                {
+                    return (NewPromptDetail != null &&
+              !string.IsNullOrEmpty(NewPromptDetail.Title)
+              && !string.IsNullOrEmpty(NewPromptDetail.Description)
+              && !string.IsNullOrEmpty(NewPromptDetail.PromptName)
+              );
+                }
                 ));
             }
         }

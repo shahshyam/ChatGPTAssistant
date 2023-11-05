@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace AssistantForWord
 {
@@ -15,23 +16,33 @@ namespace AssistantForWord
     {
         internal static async Task<string> GetResponse(string input)
         {
-            var config = ProcessData.GetData();
-            if (string.IsNullOrEmpty(config.APIKEY))
-                return string.Empty;
-            var client = new OpenAIAPI(config.APIKEY);
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var result = await client.Chat.CreateChatCompletionAsync(new ChatRequest()
+            string response = string.Empty;
+            try
             {
-                Model = GetModel(config.ModelName),
-                Temperature = config.Temperature,
-                MaxTokens = config.TokenSize,
-                Messages = new ChatMessage[] {
+                var config = ProcessData.GetData();
+                if (string.IsNullOrEmpty(config.APIKEY))
+                    return string.Empty;
+                var client = new OpenAIAPI(config.APIKEY);
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                var result = await client.Chat.CreateChatCompletionAsync(new ChatRequest()
+                {
+                    Model = GetModel(config.ModelName),
+                    Temperature = config.Temperature,
+                    MaxTokens = config.TokenSize,
+                    Messages = new ChatMessage[] {
                 new ChatMessage(ChatMessageRole.User, input)
                 }
-            });
-            return result.ToString();
+                });
+                response = result.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get response" + ex.ToString());
+            }
+            return response;
         }
+
         private static Model GetModel(string modelName)
         {
             Model model = Model.ChatGPTTurbo;

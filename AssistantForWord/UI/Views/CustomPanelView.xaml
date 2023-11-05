@@ -149,15 +149,15 @@
                     </Grid.RowDefinitions>
                     <DockPanel Grid.Row="0">
                         <TextBlock DockPanel.Dock="Top" Text="Title:"/>
-                        <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding Title,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt title"></TextBox>
+                        <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding NewPromptDetail.Title,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt title"></TextBox>
                     </DockPanel>
                     <DockPanel Grid.Row="1">
                         <TextBlock DockPanel.Dock="Top" Text="Description:"/>
-                        <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding Description,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt decription"></TextBox>
+                        <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding NewPromptDetail.Description,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt decription"></TextBox>
                     </DockPanel>
                     <DockPanel Grid.Row="2">
                         <TextBlock DockPanel.Dock="Top" Text="Prompt:"/>
-                        <TextBox  AcceptsReturn="True" Height="100" mah:ControlsHelper.CornerRadius="5" Text="{Binding PromptName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt"></TextBox>
+                        <TextBox  AcceptsReturn="True" Height="100" mah:ControlsHelper.CornerRadius="5" Text="{Binding NewPromptDetail.PromptName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt"></TextBox>
                     </DockPanel>
                     <Button Grid.Row="3" Content="Save Prompt"  Width="120" Command="{Binding SavePromptCommand}"></Button>
                 </Grid>

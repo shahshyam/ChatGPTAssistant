@@ -21,7 +21,7 @@ namespace AssistantForWord
         public  const string defaultInsertion = "btnToggleInsertAfter";
         private string selectedButtonId = defaultInsertion;
         private List<string> toggleButtonIds;        
-        private readonly string btnTemplate = @"<button id=""{0}"" tag=""{1}"" label=""{1}"" onAction=""GetSelectedText"" imageMso=""SignatureLineInsert""/>";
+        private readonly string btnTemplate = @"<button id=""{0}"" tag=""{1}"" label=""{2}"" onAction=""GetSelectedText"" imageMso=""SignatureLineInsert""/>";
         public CustomRibbonExplorer()
         {
            toggleButtonIds= new List<string>() { "btnToggleInsertAfter", "btnToggleReplace", "btnToggleInsertOnLocation" };
@@ -46,12 +46,18 @@ namespace AssistantForWord
                 var oldStatus = application.DisplayStatusBar;
                 application.DisplayStatusBar = true;
                 application.StatusBar = "Assistant is processing request";
-                string prompt = control.Tag as string;
+                string promptId = control.Tag;
                 string selectedText = WordDocumentHelper.GetSelectedText();
-                var result = await OpenAIClient.GetResponse($"{prompt}:{selectedText}");
-                WordDocumentHelper.InsertTextAfterSelection(result, selectedButtonId);
-                application.DisplayStatusBar = false;
+                var promptDetail = ProcessData.GetPromptDetailById(promptId);
+                if (promptDetail != null)
+                {
+                    var result = await OpenAIClient.GetResponse($"{promptDetail.Name}:{selectedText}");
+                    WordDocumentHelper.InsertTextAfterSelection(result, selectedButtonId);
+                }
                 application.DisplayStatusBar = oldStatus;
+                application.DisplayStatusBar = false;
+                application.DisplayAutoCompleteTips = true;
+                
             }
            
         }
@@ -97,7 +103,7 @@ namespace AssistantForWord
                 //default value restore
                 selectedButtonId = defaultInsertion;
             }
-        }        
+        }      
 
         private void DeselectAllButtonsExcept(string buttonId)
         {
@@ -125,7 +131,7 @@ namespace AssistantForWord
                 foreach (var promot in config.PromptDetailList)
                 {
                     string Id = $"btn{GetIdString()}";
-                    sb.Append(string.Format(btnTemplate, Id, promot.Title));
+                    sb.Append(string.Format(btnTemplate, Id, promot.Id, promot.Title));
                 }
             }
             if (hasContentAdded)
