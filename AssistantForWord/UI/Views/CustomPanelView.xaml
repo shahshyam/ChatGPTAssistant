@@ -42,6 +42,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             
         </Grid.RowDefinitions>
@@ -49,42 +50,57 @@
             <TextBlock DockPanel.Dock="Top" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,10,0,0" Text="Writing Assistant"/>
             <TextBlock FontStyle="Italic" HorizontalAlignment="Center" Text="It will help you to create, save, apply your own custom prompts to document text." TextWrapping="Wrap"/>
         </DockPanel>
-        <Expander Grid.Row="1" Margin="0,5" Header="OpenAI Setting">
+        <Expander Grid.Row="1" Margin="0,5" Header="OpenAI Key">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0">
+                    <TextBlock DockPanel.Dock="Top" Text="Open AI Key:"/>                    
+                    <PasswordBox  mah:ControlsHelper.CornerRadius="5" mah:TextBoxHelper.Watermark="Open AI API Key" Style="{StaticResource MahApps.Styles.PasswordBox.Button.Revealed}" 
+                                  helpers:PasswordBoxHelper.BindPassword="true"
+                    helpers:PasswordBoxHelper.BoundPassword="{Binding APIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                </DockPanel>
+                <Button Grid.Row="3" Command="{Binding SaveKeyCommand, UpdateSourceTrigger=PropertyChanged}" Width="80" Content="Save key" DockPanel.Dock="Bottom"></Button>
+            </Grid>
+        </Expander>
+
+        <Expander Grid.Row="2" Margin="0,5" Header="OpenAI Setting" Visibility="{Binding IsConfigVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>                    
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
+                
                 <DockPanel Grid.Row="0">
-                    <TextBlock DockPanel.Dock="Top" Text="Open AI Key:"/>
-                    <!--<TextBox Visibility="Hidden" mah:ControlsHelper.CornerRadius="5" Text="{Binding APIKey, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Please enter your API key"/>-->
-                    <PasswordBox  mah:ControlsHelper.CornerRadius="5" mah:TextBoxHelper.Watermark="Open AI API Key" Style="{StaticResource MahApps.Styles.PasswordBox.Button.Revealed}" 
-                                  helpers:PasswordBoxHelper.BindPassword="true"
-                    helpers:PasswordBoxHelper.BoundPassword="{Binding APIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>             
-             
-                </DockPanel>
-                <DockPanel Grid.Row="1">
                     <TextBlock DockPanel.Dock="top" Text="Temperatur:"></TextBlock>
                     <mah:NumericUpDown Value="{Binding Temperature,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:ControlsHelper.CornerRadius="5"  Interval="0.1"  Minimum="0.1" Maximum="2" />
                 </DockPanel>
-                <DockPanel Grid.Row="2">
+                <DockPanel Grid.Row="1">
                     <TextBlock DockPanel.Dock="top" Text="Token Size:"></TextBlock>
                     <mah:NumericUpDown  Minimum="200" mah:ControlsHelper.CornerRadius="5" Value="{Binding TokenSize,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Interval="100" Maximum="10000"/>
                 </DockPanel>
-                <DockPanel Grid.Row="3">
+                <DockPanel Grid.Row="2">
                     <TextBlock DockPanel.Dock="Top" Text="GPT Model:"></TextBlock>
-                    <ComboBox mah:TextBoxHelper.Watermark="Select Model"
-                   SelectedItem="{Binding SelectedModelName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:ControlsHelper.CornerRadius="5" mah:ComboBoxHelper.CharacterCasing="Normal" ItemsSource="{Binding ModelList}"></ComboBox>
+                    <ComboBox mah:TextBoxHelper.Watermark="Select Model" ItemsSource="{Binding ModelList, Mode=OneWay}"
+                    SelectedItem="{Binding SelectedModelName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:ControlsHelper.CornerRadius="5" mah:ComboBoxHelper.CharacterCasing="Normal">
+                        <!--<ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ModelID}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>-->
+                    </ComboBox>
                 </DockPanel>
-                <Button Grid.Row="4" Command="{Binding SaveKeyCommand, UpdateSourceTrigger=PropertyChanged}" Width="80" Content="Save key" DockPanel.Dock="Bottom"></Button>
+                <Button Grid.Row="3" Command="{Binding SaveOpenAIConfigCommand, UpdateSourceTrigger=PropertyChanged}" Width="80" Content="Save key" DockPanel.Dock="Bottom"></Button>
             </Grid>            
         </Expander>
         
         <!-- Prompt setting area-->
-        <Grid Grid.Row="2" Visibility="{Binding AllowPrompt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid Grid.Row="3" Visibility="{Binding AllowPrompt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>

@@ -7,6 +7,8 @@ using Word = Microsoft.Office.Interop.Word;
 using Office = Microsoft.Office.Core;
 using AssistantForWord.UI;
 using Microsoft.Office.Core;
+using System.Runtime.InteropServices;
+using AssistantForWord.UI.Helpers;
 
 namespace AssistantForWord
 {
@@ -25,6 +27,16 @@ namespace AssistantForWord
             {
                 ((Word.ApplicationEvents4_Event)application).NewDocument += ThisAddIn_NewDocument;
                 ((Word.ApplicationEvents4_Event)application).DocumentOpen += ThisAddIn_NewDocument;
+                ((Word.ApplicationEvents4_Event)application).DocumentBeforeClose += OnCloseDocument;
+            }
+        }
+
+        private void OnCloseDocument(Word.Document document, ref bool cancel)
+        {
+            if (document != null)
+            {
+                Dictdocument.Remove(document);
+                Marshal.ReleaseComObject(document);
             }
         }
 
@@ -39,7 +51,7 @@ namespace AssistantForWord
             if (!Dictdocument.ContainsKey(document))
             {
                 _settingControl = new SettingUserControl();                          
-                myCustomTaskPane = this.CustomTaskPanes.Add(_settingControl, "Writing Assistant", document?.ActiveWindow);
+                myCustomTaskPane = this.CustomTaskPanes.Add(_settingControl, AppConstant.AppTitle, document?.ActiveWindow);
                 myCustomTaskPane.DockPositionRestrict = MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoChange;
                 myCustomTaskPane.Width = 400;
             }            

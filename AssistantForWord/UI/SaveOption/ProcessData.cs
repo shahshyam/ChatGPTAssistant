@@ -14,7 +14,7 @@ namespace AssistantForWord.SaveOption
         private static List<PromptDetail> PromptDetailList { get; set; } = new List<PromptDetail>();
         private static string GetSaveDataFile()
         {
-            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AIAssitant");
+            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WritingAssitant");
             if (!Directory.Exists(folder))
             {
                 Directory.CreateDirectory(folder);

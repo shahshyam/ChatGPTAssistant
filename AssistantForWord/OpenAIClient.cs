@@ -1,4 +1,5 @@
 ﻿using AssistantForWord.SaveOption;
+using AssistantForWord.UI.Helpers;
 using OpenAI_API;
 using OpenAI_API.Chat;
 using OpenAI_API.Models;
@@ -20,14 +21,15 @@ namespace AssistantForWord
             var config = ProcessData.GetData();
             if (string.IsNullOrEmpty(config.APIKEY))
                 return string.Empty;
-            var client = new OpenAIAPI(config.APIKEY);            
+            var client = new OpenAIAPI(config.APIKEY);
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             try
-            {               
+            {
+                var model = await GetModelById(config.ModelName);
                 var result = await client.Chat.CreateChatCompletionAsync(new ChatRequest()
                 {
-                    Model = GetModel(config.ModelName),
+                    Model = model,
                     Temperature = config.Temperature,
                     MaxTokens = config.TokenSize,
                     Messages = new ChatMessage[] {
@@ -38,58 +40,47 @@ namespace AssistantForWord
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to get response" + ex.ToString());
-            }
-            var models = await client.Models.GetModelsAsync();
+                MessageBox.Show("Failed to get response" + ex.ToString(), AppConstant.AppTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }           
             return response;
         }
-                
-        private static Model GetModel(string modelName)
+
+        public static async Task<List<Model>> GetModels()
         {
-            Model model = Model.ChatGPTTurbo;
-            switch (modelName)
+            var models = new List<Model>();
+            var config = ProcessData.GetData();
+            if (string.IsNullOrEmpty(config.APIKEY))
+                return models;
+            var client = new OpenAIAPI(config.APIKEY);
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            try
             {
-                case "DefaultModel":
-                    model = Model.DefaultModel;
-                    break;
-                case "GPT4_32k_Context":
-                    model = Model.GPT4_32k_Context;
-                    break;
-                case "GPT4":
-                    model = Model.GPT4;
-                    break;
-                case "ChatGPTTurbo0301":
-                    model = Model.ChatGPTTurbo0301;
-                    break;
-                case "ChatGPTTurbo":
-                    model = Model.ChatGPTTurbo;
-                    break;
-                case "AdaTextEmbedding":
-                    model = Model.AdaTextEmbedding;
-                    break;
-                case "DavinciCode":
-                    model = Model.DavinciCode;
-                    break;
-                case "CushmanCode":
-                    model = Model.CushmanCode;
-                    break;
-                case "DavinciText":
-                    model = Model.DavinciText;
-                    break;
-                case "CurieText":
-                    model = Model.CurieText;
-                    break;
-                case "BabbageText":
-                    model = Model.BabbageText;
-                    break;
-                case "AdaText":
-                    model = Model.AdaText;
-                    break;
-                default:
-                    break;
+                models = await client.Models.GetModelsAsync();
             }
-            return model;
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get Model" + ex.ToString(), AppConstant.AppTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return models;
+        }
+        public static async Task<Model> GetModelById(string modelId )
+        {            
+            var config = ProcessData.GetData();
+            if (string.IsNullOrEmpty(config.APIKEY))
+                return null;
+            var client = new OpenAIAPI(config.APIKEY);
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            try
+            {
+               return await client.Models.RetrieveModelDetailsAsync(modelId);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get Model detail" + ex.ToString(), AppConstant.AppTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return null;
         }
     }
-
 }

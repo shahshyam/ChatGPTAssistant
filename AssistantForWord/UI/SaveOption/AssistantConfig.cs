@@ -15,8 +15,8 @@ namespace AssistantForWord.SaveOption
             PromptDetailList = new List<PromptDetail>();           
         }
         public List<PromptDetail> PromptDetailList { get; set; }
-        public string APIKEY { get; set; }
-        public string ModelName { get; set; } = "ChatGPTTurbo";
+        public string APIKEY { get; set; }        
+        public string ModelName { get; set; } = OpenAI_API.Models.Model.ChatGPTTurbo;
         public int TokenSize { get; set; } = 500;
         public double Temperature { get; set; } = 0.1;
     }

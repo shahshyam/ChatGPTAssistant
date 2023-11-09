@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="AssistantForWord" Language="1033" Version="1.0.0.0" Manufacturer="Shyam" UpgradeCode="a4b211bb-335c-4b6b-a993-dcc3f5144363">
+	<Product Id="*" Name="AssistantForWord" Language="1033" Version="1.1.0.0" Manufacturer="Shyam" UpgradeCode="a4b211bb-335c-4b6b-a993-dcc3f5144363">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" />
+		<MajorUpgrade  DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" />
 		<PropertyRef Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED"/>
 		<Condition Message="This application requires .NET Framework 4.6.Please download and install from http://www.microsoft.com/en-us/download/details.aspx?id=17718">
 			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED]]>
