@@ -17,14 +17,14 @@ namespace AssistantForWord
         internal static async Task<string> GetResponse(string input)
         {
             string response = string.Empty;
+            var config = ProcessData.GetData();
+            if (string.IsNullOrEmpty(config.APIKEY))
+                return string.Empty;
+            var client = new OpenAIAPI(config.APIKEY);            
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             try
-            {
-                var config = ProcessData.GetData();
-                if (string.IsNullOrEmpty(config.APIKEY))
-                    return string.Empty;
-                var client = new OpenAIAPI(config.APIKEY);
-                ServicePointManager.Expect100Continue = true;
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            {               
                 var result = await client.Chat.CreateChatCompletionAsync(new ChatRequest()
                 {
                     Model = GetModel(config.ModelName),
@@ -40,9 +40,10 @@ namespace AssistantForWord
             {
                 MessageBox.Show("Failed to get response" + ex.ToString());
             }
+            var models = await client.Models.GetModelsAsync();
             return response;
         }
-
+                
         private static Model GetModel(string modelName)
         {
             Model model = Model.ChatGPTTurbo;

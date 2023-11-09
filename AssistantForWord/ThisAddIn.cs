@@ -5,7 +5,6 @@ using System.Text;
 using System.Xml.Linq;
 using Word = Microsoft.Office.Interop.Word;
 using Office = Microsoft.Office.Core;
-using Microsoft.Office.Tools.Word;
 using AssistantForWord.UI;
 using Microsoft.Office.Core;
 
@@ -17,28 +16,39 @@ namespace AssistantForWord
         private Microsoft.Office.Tools.CustomTaskPane myCustomTaskPane;
         public delegate void RefreshSidebarPanel();
         public event RefreshSidebarPanel OnRefreshSidebarPanel;
+        public Dictionary<Word.Document, bool> Dictdocument = new Dictionary<Word.Document, bool>();
+        Word.Application application;
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-           
+            application = this.Application;
+            if (application != null)
+            {
+                ((Word.ApplicationEvents4_Event)application).NewDocument += ThisAddIn_NewDocument;
+                ((Word.ApplicationEvents4_Event)application).DocumentOpen += ThisAddIn_NewDocument;
+            }
         }
-        
-        public void ProcessSideBarPanel(bool isVisible)
+
+        private void ThisAddIn_NewDocument(Word.Document Doc)
         {
-            if (_settingControl == null)
+            Word.Document document = Application.ActiveDocument;
+            ProcessSideBarPanel(document, false);
+        }
+
+        public void ProcessSideBarPanel(Word.Document document, bool isVisible)
+        {            
+            if (!Dictdocument.ContainsKey(document))
             {
-                _settingControl = new SettingUserControl();
-            }
-            if (CustomTaskPanes.Count == 0)
-            {
-                myCustomTaskPane = this.CustomTaskPanes.Add(_settingControl, "AI Assistant", this.Application.ActiveWindow);
-                myCustomTaskPane.DockPositionRestrict = MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoChange;              
+                _settingControl = new SettingUserControl();                          
+                myCustomTaskPane = this.CustomTaskPanes.Add(_settingControl, "Writing Assistant", document?.ActiveWindow);
+                myCustomTaskPane.DockPositionRestrict = MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoChange;
                 myCustomTaskPane.Width = 400;
-            }
+            }            
             if (isVisible)
             {
                 OnRefreshSidebarPanel?.Invoke();
             }
             myCustomTaskPane.Visible = isVisible;
+            Dictdocument[document] = isVisible;
         }
        
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()

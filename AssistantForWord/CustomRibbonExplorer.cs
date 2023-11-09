@@ -1,6 +1,7 @@
 ﻿using AssistantForWord.SaveOption;
 using AssistantForWord.UI.Models;
 using System;
+using Word = Microsoft.Office.Interop.Word;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,8 +16,7 @@ namespace AssistantForWord
     [ComVisible(true)]
     public class CustomRibbonExplorer : Office.IRibbonExtensibility
     {
-        private Office.IRibbonUI ribbon;
-        private bool isPressed;
+        private Office.IRibbonUI ribbon;       
         private bool isFirstTimeDisplay;
         public  const string defaultInsertion = "btnToggleInsertAfter";
         private string selectedButtonId = defaultInsertion;
@@ -51,9 +51,10 @@ namespace AssistantForWord
                 var promptDetail = ProcessData.GetPromptDetailById(promptId);
                 if (promptDetail != null)
                 {
-                    var result = await OpenAIClient.GetResponse($"{promptDetail.Name}:{selectedText}");
+                    var result = await OpenAIClient.GetResponse($"{promptDetail.Name}{selectedText}");
                     WordDocumentHelper.InsertTextAfterSelection(result, selectedButtonId);
                 }
+                application.Selection.Collapse();
                 application.DisplayStatusBar = oldStatus;
                 application.DisplayStatusBar = false;
                 application.DisplayAutoCompleteTips = true;
@@ -68,7 +69,9 @@ namespace AssistantForWord
         }
         public bool GetPressed(Office.IRibbonControl control)
         {
-            return isPressed;
+            Word.Document document = Globals.ThisAddIn.Application.ActiveDocument;
+            Globals.ThisAddIn.Dictdocument.TryGetValue(document, out bool result);
+            return result;
         } 
         
         public void InvalidateControl(string controlId)
@@ -76,10 +79,10 @@ namespace AssistantForWord
             ribbon.InvalidateControl(controlId);           
         }
         public void ShowSetting(Office.IRibbonControl control, bool isPressed)
-        {
-            this.isPressed = isPressed;
+        {            
             InvalidateControl(control.Id);
-            Globals.ThisAddIn.ProcessSideBarPanel(this.isPressed);
+            Word.Document document = Globals.ThisAddIn.Application.ActiveDocument;
+            Globals.ThisAddIn.ProcessSideBarPanel(document, isPressed);
         }
        
         public bool GroupGetPressed(Office.IRibbonControl control)

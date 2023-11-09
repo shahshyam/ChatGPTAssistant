@@ -46,8 +46,8 @@
             
         </Grid.RowDefinitions>
         <DockPanel Margin="5">
-            <TextBlock DockPanel.Dock="Top" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,10,0,0" Text="AI Assistant"/>
-            <TextBlock FontStyle="Italic" HorizontalAlignment="Center" Text="It will help you to summerize, extend, pharaphrase, generate new text and many more" TextWrapping="Wrap"/>
+            <TextBlock DockPanel.Dock="Top" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,10,0,0" Text="Writing Assistant"/>
+            <TextBlock FontStyle="Italic" HorizontalAlignment="Center" Text="It will help you to create, save, apply your own custom prompts to document text." TextWrapping="Wrap"/>
         </DockPanel>
         <Expander Grid.Row="1" Margin="0,5" Header="OpenAI Setting">
             <Grid>
@@ -93,7 +93,7 @@
             <DataGrid Grid.Row="1" ItemsSource="{Binding PromptList}" SelectedItem="{Binding SelectedPromptDetail}"
                       SelectionUnit="FullRow" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="32" CanUserDeleteRows="False" SelectionMode="Single" CanUserResizeRows="False" CanUserAddRows="False" GridLinesVisibility="None">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Prompt" Width="*">
+                    <DataGridTemplateColumn Header="Title" Width="*" CanUserSort="True" SortMemberPath="Title" SortDirection="Ascending">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Padding="5,3" Text="{Binding Title}">
@@ -105,8 +105,21 @@
                                 </TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>                   
-                    <DataGridTemplateColumn Header="Action" Width="*">
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Description" Width="*" CanUserSort="True" SortMemberPath="Description" SortDirection="Ascending">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Padding="5,3" Text="{Binding Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip>
+                                            <TextBlock Text="{Binding Description}" FontStyle="Italic"></TextBlock>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Action" Width="auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -157,7 +170,7 @@
                     </DockPanel>
                     <DockPanel Grid.Row="2">
                         <TextBlock DockPanel.Dock="Top" Text="Prompt:"/>
-                        <TextBox  AcceptsReturn="True" Height="100" mah:ControlsHelper.CornerRadius="5" Text="{Binding NewPromptDetail.PromptName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt"></TextBox>
+                        <TextBox  AcceptsReturn="True" TextWrapping="Wrap" Height="100" mah:ControlsHelper.CornerRadius="5" Text="{Binding NewPromptDetail.PromptName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt"></TextBox>
                     </DockPanel>
                     <Button Grid.Row="3" Content="Save Prompt"  Width="120" Command="{Binding SavePromptCommand}"></Button>
                 </Grid>

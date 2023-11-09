@@ -55,7 +55,7 @@ namespace AssistantForWord
             thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
             thread.Start();
             thread.Join();
-            MessageBox.Show("Please paste result on selected location", "AI Assistant", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Please paste result at selected location", "Writing Assistant", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

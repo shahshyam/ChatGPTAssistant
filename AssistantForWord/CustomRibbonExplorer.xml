@@ -2,13 +2,13 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
 	<ribbon>
 		<tabs>
-			<tab id="Assistant" label="AI Assistant">
+			<tab id="Assistant" label="Writing Assistant" insertAfterMso="TabHome">
 				<group id="MyGroup"
-					   label="My Group">					
+					   label="Setting">					
 					<toggleButton  id="btnPanel" label="Settings" getPressed="GetPressed" size="large" onAction="ShowSetting"/>
 					<separator/>
 				</group>				
-				<group id="group1" label="Selected Text Option" >
+				<group id="group1" label="Output Text Location" >
 					<toggleButton id="btnToggleInsertAfter" label="Insert After" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
 					<toggleButton id="btnToggleReplace" label="Replace" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
 					<toggleButton id="btnToggleInsertOnLocation" label="Insert on Location" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
@@ -18,7 +18,7 @@
 	</ribbon>
 	<contextMenus>
 		<contextMenu idMso="ContextMenuText">			
-			<dynamicMenu id="AssistantContextMenu" label="Assistant new " getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+			<dynamicMenu id="AssistantContextMenu" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
 		</contextMenu>
 	</contextMenus>
 </customUI>
