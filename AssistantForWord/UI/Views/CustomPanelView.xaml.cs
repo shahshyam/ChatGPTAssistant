@@ -34,7 +34,7 @@ namespace AssistantForWord.UI.Views
 
         private void OnCustomPanelViewLoaded(object sender, RoutedEventArgs e)
         {
-            RefreshValue();
+            //RefreshValue();
         }
         internal void RefreshValue()
         {

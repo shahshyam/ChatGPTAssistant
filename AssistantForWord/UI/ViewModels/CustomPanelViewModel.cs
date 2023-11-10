@@ -1,7 +1,6 @@
 ﻿using AssistantForWord.SaveOption;
 using AssistantForWord.UI.Commands;
 using AssistantForWord.UI.Models;
-using OpenAIModel = OpenAI_API.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,20 +8,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Data;
 
 namespace AssistantForWord.UI.ViewModels
 {
-   public class CustomPanelViewModel:ViewModelBase
+    public class CustomPanelViewModel : ViewModelBase
     {
         public ObservableCollection<PromptViewModel> PromptList { get; set; }
-        public ObservableCollection<string> ModelList { get; set; }
-        private static object _lock = new object();
+
         public CustomPanelViewModel()
         {
             PromptList = new ObservableCollection<PromptViewModel>();
-            ModelList = new ObservableCollection<string>();
-            BindingOperations.EnableCollectionSynchronization(ModelList, _lock);
         }
         internal void LoadExistingData()
         {
@@ -31,15 +26,8 @@ namespace AssistantForWord.UI.ViewModels
             var config = ProcessData.GetData();
             APIKey = config.APIKEY;
             AllowPrompt = !string.IsNullOrEmpty(APIKey);
-            IsConfigVisible= !string.IsNullOrEmpty(APIKey);
             Temperature = config.Temperature;
             TokenSize = config.TokenSize;
-            if (!string.IsNullOrEmpty(config.APIKEY))
-            {
-                LoadModels();
-                
-            }
-            
             SelectedModelName = config.ModelName;
             foreach (var prompt in config.PromptDetailList)
             {
@@ -58,7 +46,9 @@ namespace AssistantForWord.UI.ViewModels
         public string APIKey
         {
             get { return apiKey; }
-            set { apiKey = value;
+            set
+            {
+                apiKey = value;
                 OnPropertyChanged();
             }
         }
@@ -67,7 +57,9 @@ namespace AssistantForWord.UI.ViewModels
         public string SelectedModelName
         {
             get { return selectedModelName; }
-            set { selectedModelName = value;
+            set
+            {
+                selectedModelName = value;
                 OnPropertyChanged();
             }
         }
@@ -76,7 +68,9 @@ namespace AssistantForWord.UI.ViewModels
         public int TokenSize
         {
             get { return tokenSize; }
-            set { tokenSize = value;
+            set
+            {
+                tokenSize = value;
                 OnPropertyChanged();
             }
         }
@@ -85,42 +79,33 @@ namespace AssistantForWord.UI.ViewModels
         public double Temperature
         {
             get { return temperature; }
-            set { temperature = value;
+            set
+            {
+                temperature = value;
                 OnPropertyChanged();
             }
         }
-        private bool isConfigVisible;
-
-        public bool IsConfigVisible
+        public List<string> ModelList
         {
-            get { return isConfigVisible; }
-            set { isConfigVisible = value;
-                OnPropertyChanged();
-            }
+            get => new List<string>() { "DefaultModel",
+            "GPT4_32k_Context","GPT4" , "ChatGPTTurbo0301","ChatGPTTurbo",
+            "AdaTextEmbedding","DavinciCode","CushmanCode","DavinciText","CurieText",
+            "BabbageText","AdaText"};
         }
 
-       private ICommand saveKeyCommand;
+        private ICommand saveKeyCommand;
         public ICommand SaveKeyCommand
         {
             get
             {
                 return saveKeyCommand ?? (saveKeyCommand = new RelayCommand((x) =>
                 {
-                    SaveConfig();
-                    IsConfigVisible = true;
-                    LoadModels();
-                }, y => { return !string.IsNullOrEmpty(APIKey); }
-                ));
-            }
-        }
-        private ICommand saveOpenAIConfigCommand;
-        public ICommand SaveOpenAIConfigCommand
-        {
-            get
-            {
-                return saveOpenAIConfigCommand ?? (saveOpenAIConfigCommand = new RelayCommand((x) =>
-                {
-                    SaveConfig();
+                    var config = ProcessData.GetData();
+                    config.APIKEY = this.APIKey;
+                    config.Temperature = Temperature;
+                    config.ModelName = SelectedModelName;
+                    config.TokenSize = TokenSize;
+                    ProcessData.SaveData(config);
                     AllowPrompt = true;
                 }, y => { return !string.IsNullOrEmpty(APIKey); }
                 ));
@@ -131,33 +116,16 @@ namespace AssistantForWord.UI.ViewModels
         public bool AllowPrompt
         {
             get { return allowPrompt; }
-            set { allowPrompt = value;
+            set
+            {
+                allowPrompt = value;
                 OnPropertyChanged();
             }
-        }        
-        private async void LoadModels()
-        {
-            var models = await OpenAIClient.GetModels();
-            if (ModelList.Count > 0)
-                ModelList.Clear();
-            foreach(var model in models)
-            {
-                ModelList.Add(model.ModelID);
-            }
-            //ModelList = new ObservableCollection<OpenAIModel.Model>(models);
         }
-        private void SaveConfig()
-        {
-            var config = ProcessData.GetData();
-            config.APIKEY = this.APIKey;
-            config.Temperature = Temperature;
-            config.ModelName = SelectedModelName;
-            config.TokenSize = TokenSize;
-            ProcessData.SaveData(config);
-        }
+
         #endregion
         #region PROMPT
-        
+
         private PromptViewModel newPromptDetail = new PromptViewModel();
         public PromptViewModel NewPromptDetail
         {
@@ -173,7 +141,9 @@ namespace AssistantForWord.UI.ViewModels
         public PromptViewModel SelectedPromptDetail
         {
             get { return selectedPromptDetail; }
-            set { selectedPromptDetail = value;
+            set
+            {
+                selectedPromptDetail = value;
                 OnPropertyChanged();
             }
         }

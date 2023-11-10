@@ -51,7 +51,7 @@ namespace AssistantForWord
                 var promptDetail = ProcessData.GetPromptDetailById(promptId);
                 if (promptDetail != null)
                 {
-                    var result = await OpenAIClient.GetResponse($"{promptDetail.Name}{selectedText}");
+                    var result = await OpenAIClient.GetResponse($"{promptDetail.Name} {selectedText}");
                     WordDocumentHelper.InsertTextAfterSelection(result, selectedButtonId);
                 }
                 application.Selection.Collapse();
