@@ -11,7 +11,7 @@
 				<group id="group1" label="Output Text Location" >
 					<toggleButton id="btnToggleInsertAfter" label="Insert After" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
 					<toggleButton id="btnToggleReplace" label="Replace" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
-					<toggleButton id="btnToggleInsertOnLocation" label="Insert on Location" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleInsertOnLocation" label="Insert at Location" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
 				</group>
 			</tab>
 		</tabs>
