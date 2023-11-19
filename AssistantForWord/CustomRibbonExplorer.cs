@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Office = Microsoft.Office.Core;
-
+using System.Drawing;
 
 namespace AssistantForWord
 {
@@ -21,7 +21,7 @@ namespace AssistantForWord
         public  const string defaultInsertion = "btnToggleInsertAfter";
         private string selectedButtonId = defaultInsertion;
         private List<string> toggleButtonIds;        
-        private readonly string btnTemplate = @"<button id=""{0}"" tag=""{1}"" label=""{2}"" onAction=""GetSelectedText"" imageMso=""SignatureLineInsert""/>";
+        private readonly string btnTemplate = @"<button id=""{0}"" tag=""{1}"" label=""{2}"" onAction=""GetSelectedText"" imageMso=""AutoSummarize""/>";
         public CustomRibbonExplorer()
         {
            toggleButtonIds= new List<string>() { "btnToggleInsertAfter", "btnToggleReplace", "btnToggleInsertOnLocation" };
@@ -72,8 +72,19 @@ namespace AssistantForWord
             Word.Document document = Globals.ThisAddIn.Application.ActiveDocument;
             Globals.ThisAddIn.Dictdocument.TryGetValue(document, out bool result);
             return result;
-        } 
-        
+        }
+        public Bitmap GetImageLocally(Office.IRibbonControl control)
+        {
+            if (control.Id == "btnPanel")
+                return Properties.Resources.window_gear;
+            else if (control.Id == "btnToggleReplace")
+                return Properties.Resources.replace;
+            else if (control.Id == "btnToggleInsertOnLocation")
+                return Properties.Resources.pointer;
+            else if (control.Id == "btnToggleInsertAfter")
+                return Properties.Resources.button_angle_right;
+            return null;
+        }
         public void InvalidateControl(string controlId)
         {
             ribbon.InvalidateControl(controlId);           

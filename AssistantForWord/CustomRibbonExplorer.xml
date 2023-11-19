@@ -5,13 +5,13 @@
 			<tab id="Assistant" label="Writing Assistant" insertAfterMso="TabHome">
 				<group id="MyGroup"
 					   label="Setting">					
-					<toggleButton  id="btnPanel" label="Settings" getPressed="GetPressed" size="large" onAction="ShowSetting"/>
+					<toggleButton  id="btnPanel" label="Settings" getImage="GetImageLocally" getPressed="GetPressed" size="large" onAction="ShowSetting"/>
 					<separator/>
 				</group>				
 				<group id="group1" label="Output Text Location" >
-					<toggleButton id="btnToggleInsertAfter" label="Insert After" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
-					<toggleButton id="btnToggleReplace" label="Replace" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
-					<toggleButton id="btnToggleInsertOnLocation" label="Insert at Location" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleInsertAfter" getImage="GetImageLocally" label="Insert After" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleReplace" getImage="GetImageLocally" label="Replace" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleInsertOnLocation" getImage="GetImageLocally" label="Insert at Location" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
 				</group>
 			</tab>
 		</tabs>
@@ -20,6 +20,28 @@
 		<contextMenu idMso="ContextMenuText">			
 			<dynamicMenu id="AssistantContextMenu" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
 		</contextMenu>
+	<contextMenu idMso="ContextMenuHeading">			
+			<dynamicMenu id="AssistantContextMenuHeading" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	<contextMenu idMso="ContextMenuInlineActiveXControl">			
+			<dynamicMenu id="AssistantContextMenuInlineActiveXControl" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	<contextMenu idMso="ContextMenuList">			
+			<dynamicMenu id="AssistantContextMenuList" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	
+	<contextMenu idMso="ContextMenuTable">			
+			<dynamicMenu id="AssistantContextMenuTable" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	
+		<contextMenu idMso="ContextMenuListTable">			
+			<dynamicMenu id="AssistantContextMenuListTable" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	
+	<contextMenu idMso="ContextMenuTextTable">			
+			<dynamicMenu id="AssistantContextMenuTextTable" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
 	</contextMenus>
+
 </customUI>
 
