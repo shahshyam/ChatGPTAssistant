@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:helpers="clr-namespace:AssistantForWord.Helpers"
              xmlns:local="clr-namespace:AssistantForWord.UI.Views"
              mc:Ignorable="d" 
              FontFamily="Segoe UI"
@@ -31,6 +32,7 @@
                 <Setter Property="Margin" Value="0,5"/>
                 <Setter Property="Height" Value="30"/>
                 <Setter Property="mah:ControlsHelper.CornerRadius" Value="5"/>
+                <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style TargetType="DockPanel">
                 <Setter Property="Margin" Value="5"/>
@@ -41,14 +43,16 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             
         </Grid.RowDefinitions>
         <DockPanel Margin="5">
-            <TextBlock DockPanel.Dock="Top" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,10,0,0" Text="AI Assistant"/>
-            <TextBlock FontStyle="Italic" HorizontalAlignment="Center" Text="It will help you to summerize, extend, pharaphrase, generate new text and many more" TextWrapping="Wrap"/>
+            <TextBlock DockPanel.Dock="Top" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,10,0,0" Text="Writing Assistant"/>
+            <TextBlock FontStyle="Italic" HorizontalAlignment="Center" Text="Create, save and apply your own custom prompts to document text." TextWrapping="Wrap"/>
         </DockPanel>
-        <Expander Grid.Row="1" Margin="0,5" Header="OpenAI Setting">
+        
+        <Expander Grid.Row="1" Margin="0,5" Header="OpenAI Key">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
@@ -58,11 +62,14 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0">
-                    <TextBlock DockPanel.Dock="Top" Text="Open AI Key:"/>
-                    <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding APIKey, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Please enter your API key"/>
+                    <TextBlock DockPanel.Dock="Top" Text="Open AI Key:"/>                    
+                    <PasswordBox  mah:ControlsHelper.CornerRadius="5" mah:TextBoxHelper.Watermark="Open AI API Key" Style="{StaticResource MahApps.Styles.PasswordBox.Button.Revealed}" 
+                                  helpers:PasswordBoxHelper.BindPassword="true"
+                    helpers:PasswordBoxHelper.BoundPassword="{Binding APIKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
                 </DockPanel>
                 <DockPanel Grid.Row="1">
-                    <TextBlock DockPanel.Dock="top" Text="Temperatur:"></TextBlock>
+                    <TextBlock DockPanel.Dock="top" Text="Temperature:"></TextBlock>
                     <mah:NumericUpDown Value="{Binding Temperature,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:ControlsHelper.CornerRadius="5"  Interval="0.1"  Minimum="0.1" Maximum="2" />
                 </DockPanel>
                 <DockPanel Grid.Row="2">
@@ -71,12 +78,18 @@
                 </DockPanel>
                 <DockPanel Grid.Row="3">
                     <TextBlock DockPanel.Dock="Top" Text="GPT Model:"></TextBlock>
-                    <ComboBox mah:TextBoxHelper.Watermark="Select Model"
-                   SelectedItem="{Binding SelectedModelName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:ControlsHelper.CornerRadius="5" mah:ComboBoxHelper.CharacterCasing="Normal" ItemsSource="{Binding ModelList}"></ComboBox>
+                    <ComboBox mah:TextBoxHelper.Watermark="Select Model" ItemsSource="{Binding ModelList, Mode=OneWay}"
+                    SelectedItem="{Binding SelectedModelName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:ControlsHelper.CornerRadius="5" mah:ComboBoxHelper.CharacterCasing="Normal">
+                        <!--<ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ModelID}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>-->
+                    </ComboBox>
                 </DockPanel>
                 <Button Grid.Row="4" Command="{Binding SaveKeyCommand, UpdateSourceTrigger=PropertyChanged}" Width="80" Content="Save key" DockPanel.Dock="Bottom"></Button>
-            </Grid>            
-        </Expander>
+            </Grid>
+        </Expander>        
         
         <!-- Prompt setting area-->
         <Grid Grid.Row="2" Visibility="{Binding AllowPrompt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -88,7 +101,7 @@
             <DataGrid Grid.Row="1" ItemsSource="{Binding PromptList}" SelectedItem="{Binding SelectedPromptDetail}"
                       SelectionUnit="FullRow" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="32" CanUserDeleteRows="False" SelectionMode="Single" CanUserResizeRows="False" CanUserAddRows="False" GridLinesVisibility="None">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Prompt" Width="*">
+                    <DataGridTemplateColumn Header="Title" Width="*" CanUserSort="True" SortMemberPath="Title" SortDirection="Ascending">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Padding="5,3" Text="{Binding Title}">
@@ -100,43 +113,74 @@
                                 </TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>                   
-                    <DataGridTemplateColumn Header="Action" Width="80">
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Description" Width="*" CanUserSort="True" SortMemberPath="Description" SortDirection="Ascending">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Del" Padding="5,3" Width="40" Height="30" Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid},Path=DataContext.DeletePromptCommand}" CommandParameter="{Binding}">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Style.Resources>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="CornerRadius" Value="5"></Setter>
-                                                </Style>
-                                            </Style.Resources>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
+                                <TextBlock Padding="5,3" Text="{Binding Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip>
+                                            <TextBlock Text="{Binding Description}" FontStyle="Italic"></TextBlock>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Action" Width="auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Edit" Margin="5,0,0,0" mah:ControlsHelper.ContentCharacterCasing="Normal" Padding="5,3" Width="40" Height="30" Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid},Path=DataContext.EditPromptCommand}" CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="5"></Setter>
+                                                    </Style>
+                                                </Style.Resources>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="Del" Margin="5,0,0,0" mah:ControlsHelper.ContentCharacterCasing="Normal" Padding="5,3" Width="40" Height="30" Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid},Path=DataContext.DeletePromptCommand}" CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="5"></Setter>
+                                                    </Style>
+                                                </Style.Resources>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>                                                                     
+                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-            
-            <Expander Header="Prompt Setting" Grid.Row="0" Margin="0,5">
+
+            <Expander Header="Prompt Setting" Grid.Row="0" Margin="0,5,0,10" IsExpanded="{Binding IsExpand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <DockPanel Grid.Row="0">
                         <TextBlock DockPanel.Dock="Top" Text="Title:"/>
-                        <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding Title,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt title"></TextBox>
+                        <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding NewPromptDetail.Title,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt title"></TextBox>
                     </DockPanel>
                     <DockPanel Grid.Row="1">
                         <TextBlock DockPanel.Dock="Top" Text="Description:"/>
-                        <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding Description,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt decription"></TextBox>
+                        <TextBox mah:ControlsHelper.CornerRadius="5" Text="{Binding NewPromptDetail.Description,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt decription"></TextBox>
                     </DockPanel>
-                    <Button Grid.Row="2" Content="Save Prompt"  Width="120" Command="{Binding SavePromptCommand}"></Button>
+                    <DockPanel Grid.Row="2">
+                        <TextBlock DockPanel.Dock="Top" Text="Prompt:"/>
+                        <TextBox  AcceptsReturn="True" TextWrapping="Wrap" Height="100" mah:ControlsHelper.CornerRadius="5" Text="{Binding NewPromptDetail.PromptName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" mah:TextBoxHelper.Watermark="Enter Prompt"></TextBox>
+                    </DockPanel>
+                    <Button Grid.Row="3" Content="Save Prompt"  Width="120" Command="{Binding SavePromptCommand}"></Button>
                 </Grid>
             </Expander>
         </Grid>

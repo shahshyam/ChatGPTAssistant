@@ -2,26 +2,46 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
 	<ribbon>
 		<tabs>
-			<tab id="Assistant" label="AI Assistant">
+			<tab id="Assistant" label="Writing Assistant" insertAfterMso="TabHome">
 				<group id="MyGroup"
-					   label="My Group">
-					<button id="chatgpt" size="large" label="ChatGPT"/>
-					<toggleButton  id="btnPanel" label="Settings" getPressed="GetPressed" size="large" onAction="ShowSetting"/>
+					   label="Setting">					
+					<toggleButton  id="btnPanel" label="Settings" getImage="GetImageLocally" getPressed="GetPressed" size="large" onAction="ShowSetting"/>
 					<separator/>
-				</group>
-				<group id="group1" label="Toggle Group">
-					<toggleButton id="toggleButton1" label="Option 1" getPressed="GroupGetPressed" onAction="ToggleButton_Click"/>
-					<toggleButton id="toggleButton2" label="Option 2" getPressed="GroupGetPressed" onAction="ToggleButton_Click"/>
-					<toggleButton id="toggleButton3" label="Option 3" getPressed="GroupGetPressed" onAction="ToggleButton_Click"/>
+				</group>				
+				<group id="group1" label="Output Text Location" >
+					<toggleButton id="btnToggleInsertAfter" getImage="GetImageLocally" label="Insert After" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleReplace" getImage="GetImageLocally" label="Replace" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
+					<toggleButton id="btnToggleInsertOnLocation" getImage="GetImageLocally" label="Insert at Location" getPressed="GroupGetPressed" onAction="ToggleButton_Click" size="large"/>
 				</group>
 			</tab>
 		</tabs>
 	</ribbon>
 	<contextMenus>
-		<contextMenu idMso="ContextMenuText">
-			<menu id="mainAssitant" label="Assistant" getVisible="IsVisibleAssistant">
-			</menu>
+		<contextMenu idMso="ContextMenuText">			
+			<dynamicMenu id="AssistantContextMenu" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	<contextMenu idMso="ContextMenuHeading">			
+			<dynamicMenu id="AssistantContextMenuHeading" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	<contextMenu idMso="ContextMenuInlineActiveXControl">			
+			<dynamicMenu id="AssistantContextMenuInlineActiveXControl" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	<contextMenu idMso="ContextMenuList">			
+			<dynamicMenu id="AssistantContextMenuList" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	
+	<contextMenu idMso="ContextMenuTable">			
+			<dynamicMenu id="AssistantContextMenuTable" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	
+		<contextMenu idMso="ContextMenuListTable">			
+			<dynamicMenu id="AssistantContextMenuListTable" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
+		</contextMenu>
+	
+	<contextMenu idMso="ContextMenuTextTable">			
+			<dynamicMenu id="AssistantContextMenuTextTable" label="Writing Assistant" getContent="GetMenuContent" getVisible="IsVisibleAssistant"/>
 		</contextMenu>
 	</contextMenus>
+
 </customUI>
 

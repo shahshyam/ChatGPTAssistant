@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="AssistantForWord" Language="1033" Version="1.3.0.0" Manufacturer="Shyam" UpgradeCode="a4b211bb-335c-4b6b-a993-dcc3f5144363">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade  DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" />
+		<PropertyRef Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED"/>
+		<Condition Message="This application requires .NET Framework 4.6.Please download and install from http://www.microsoft.com/en-us/download/details.aspx?id=17718">
+			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED]]>
+		</Condition>
+		<Media Id="1" Cabinet="AssistantForWord.cab" EmbedCab="yes"/>
+
+		<Feature Id="ProductFeature" Title="AssistantForWord" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentRef Id="Registry_FriendlyName" />
+			<ComponentRef Id="Registry_Description" />
+			<ComponentRef Id="Registry_Manifest" />
+			<ComponentRef Id="Registry_LoadBehavior" />
+		</Feature>
+		<UIRef Id="WixUI_Minimal"></UIRef>
+		<UIRef Id="WixUI_ErrorProgressText" />
+		<WixVariable Id="WixUILicenseRtf" Value="EULA.rtf" />
+		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Thank you for installing AssistantForWord Add-In." />
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="AssistantForWord" />
+				<Component Id="Registry_FriendlyName">
+					<RegistryValue Id="RegKey_FriendlyName" Root="HKCU"
+											 Key="Software\Microsoft\Office\Word\Addins\AssistantForWord"
+											 Name="FriendlyName"
+											 Value="AssistantForWord Plugin"
+											 Type="string" KeyPath="yes" />
+				</Component>
+				<Component Id="Registry_Description">
+					<RegistryValue Id="RegKey_Description" Root="HKCU"
+											 Key="Software\Microsoft\Office\Word\Addins\AssistantForWord"
+											 Name="Description"
+											 Value="AssistantForWord Plugin for Word"
+											 Type="string" KeyPath="yes" />
+				</Component>
+				<Component Id="Registry_Manifest">
+					<RegistryValue Id="RegKey_Manifest" Root="HKCU"
+											 Key="Software\Microsoft\Office\Word\Addins\AssistantForWord"
+											 Name="Manifest" Value="[INSTALLFOLDER]AssistantForWord.vsto|vstolocal"
+											 Type="string" KeyPath="yes" />
+				</Component>
+				<Component Id="Registry_LoadBehavior">
+					<RegistryValue Id="RegKey_LoadBehavior" Root="HKCU"
+											 Key="Software\Microsoft\Office\Word\Addins\AssistantForWord"
+											 Name="LoadBehavior" Value="3"
+											 Type="integer" KeyPath="yes" />
+				</Component>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="AssistantForWord_vsto_Component">
+				<File Id="AssistantForWord_vsto" KeyPath="yes"
+							  Name="AssistantForWord.vsto" Source="$(var.AddinFiles)"></File>
+			</Component>
+
+			<Component Id="AssistantForWord_dll_manifest_Component">
+				<File Id="AssistantForWord.dll.manifest" KeyPath="yes"
+							  Name="AssistantForWord.dll.manifest" Source="$(var.AddinFiles)"></File>
+			</Component>
+
+			<Component Id="AssistantForWord_dll_Component" >
+				<File Id="AssistantForWord_dll" KeyPath="yes"
+							  Name="AssistantForWord.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="AssistantForWord_dll.config_Component" >
+               <File Id="AssistantForWord.dll.config" KeyPath="yes"
+					  Name="AssistantForWord.dll.config" Source="$(var.AddinFiles)" />
+             </Component>
+			<!-- Mahapp component-->
+			<Component Id="ControlzEx.dll_Component" >
+				<File Id="ControlzEx.dll" KeyPath="yes"
+					   Name="ControlzEx.dll" Source="$(var.AddinFiles)" />
+			</Component>
+
+			<Component Id="MahApps.Metro.dll_Component" >
+				<File Id="MahApps.Metro.dll" KeyPath="yes"
+					   Name="MahApps.Metro.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="Microsoft.Xaml.Behaviors.dll_Component" >
+				<File Id="Microsoft.Xaml.Behaviors.dll" KeyPath="yes"
+					   Name="Microsoft.Xaml.Behaviors.dll" Source="$(var.AddinFiles)" />
+			</Component>
+
+			<Component Id="Microsoft.Bcl.AsyncInterfaces.dll_Component" >
+				<File Id="Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes"
+					   Name="Microsoft.Bcl.AsyncInterfaces.dll" Source="$(var.AddinFiles)" />
+			</Component>
+
+			<Component Id="Microsoft.Extensions.Configuration.Abstractions.dll_Component" >
+				<File Id="Microsoft.Extensions.Configuration.Abstractions.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.Configuration.Abstractions.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="Microsoft.Extensions.Configuration.Binder.dll_Component" >
+				<File Id="Microsoft.Extensions.Configuration.Binder.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.Configuration.Binder.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="Microsoft.Extensions.Configuration.dll_Component" >
+				<File Id="Microsoft.Extensions.Configuration.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.Configuration.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="Microsoft.Extensions.DependencyInjection.Abstractions.dll_Component" >
+				<File Id="Microsoft.Extensions.DependencyInjection.Abstractions.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="Microsoft.Extensions.Http.dll_Component" >
+				<File Id="Microsoft.Extensions.Http.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.Http.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="Microsoft.Extensions.Logging.Abstractions.dll_Component" >
+				<File Id="Microsoft.Extensions.Logging.Abstractions.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.Logging.Abstractions.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="Microsoft.Extensions.Logging.dll_Component" >
+				<File Id="Microsoft.Extensions.Logging.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.Logging.dll" Source="$(var.AddinFiles)" />
+			</Component>
+
+			<Component Id="Microsoft.Extensions.Options.dll_Component" >
+				<File Id="Microsoft.Extensions.Options.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.Options.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="Microsoft.Extensions.Primitives.dll_Component" >
+				<File Id="Microsoft.Extensions.Primitives.dll" KeyPath="yes"
+					   Name="Microsoft.Extensions.Primitives.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="System.Buffers.dll_Component" >
+				<File Id="System.Buffers.dll" KeyPath="yes"
+					   Name="System.Buffers.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="System.Memory.dll_Component" >
+				<File Id="System.Memory.dll" KeyPath="yes"
+					   Name="System.Memory.dll" Source="$(var.AddinFiles)" />
+			</Component>
+
+			<Component Id="System.Numerics.Vectors.dll_Component" >
+				<File Id="System.Numerics.Vectors.dll" KeyPath="yes"
+					   Name="System.Numerics.Vectors.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			<Component Id="System.Runtime.CompilerServices.Unsafe.dll_Component" >
+				<File Id="System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes"
+					   Name="System.Runtime.CompilerServices.Unsafe.dll" Source="$(var.AddinFiles)" />
+			</Component>
+
+			<Component Id="System.Threading.Tasks.Extensions.dll_Component" >
+				<File Id="System.Threading.Tasks.Extensions.dll" KeyPath="yes"
+					   Name="System.Threading.Tasks.Extensions.dll" Source="$(var.AddinFiles)" />
+			</Component>
+
+			<Component Id="Newtonsoft.Json.dll_Component" >
+				<File Id="Newtonsoft.Json.dll" KeyPath="yes"
+					   Name="Newtonsoft.Json.dll" Source="$(var.AddinFiles)" />
+			</Component>
+
+			<Component Id="OpenAI_API.dll_Component" >
+				<File Id="OpenAI_API.dll" KeyPath="yes"
+					   Name="OpenAI_API.dll" Source="$(var.AddinFiles)" />
+			</Component>
+			
+			<Component Id="MSOfficeToolsCommon_dll_Component">
+				<File Id="MSOfficeToolsCommon_dll" KeyPath="yes"
+							  Name="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="$(var.AddinFiles)"></File>
+			</Component>
+
+			<Component Id="Microsoft.VisualStudio_Tools_Applications_Runtime_dll_component">
+				<File Id="Microsoft.VisualStudio.Tools_Applications_Runtime.dll" KeyPath="yes"
+							  Name="Microsoft.VisualStudio.Tools.Applications.Runtime.dll" Source="$(var.AddinFiles)">
+				</File>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>

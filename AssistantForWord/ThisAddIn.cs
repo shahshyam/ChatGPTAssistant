@@ -5,9 +5,10 @@ using System.Text;
 using System.Xml.Linq;
 using Word = Microsoft.Office.Interop.Word;
 using Office = Microsoft.Office.Core;
-using Microsoft.Office.Tools.Word;
 using AssistantForWord.UI;
 using Microsoft.Office.Core;
+using System.Runtime.InteropServices;
+using AssistantForWord.UI.Helpers;
 
 namespace AssistantForWord
 {
@@ -15,30 +16,56 @@ namespace AssistantForWord
     {
         private SettingUserControl _settingControl;
         private Microsoft.Office.Tools.CustomTaskPane myCustomTaskPane;
-        public CustomRibbonExplorer customRibbonExplorer;
+        public delegate void RefreshSidebarPanel();
+        public event RefreshSidebarPanel OnRefreshSidebarPanel;
+        public Dictionary<Word.Document, bool> Dictdocument = new Dictionary<Word.Document, bool>();
+        Word.Application application;
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-
-        }
-        public void ProcessSideBarPanel(bool isVisible)
-        {
-            if (_settingControl == null)
+            application = this.Application;
+            if (application != null)
             {
-                _settingControl = new SettingUserControl();
+                ((Word.ApplicationEvents4_Event)application).NewDocument += ThisAddIn_NewDocument;
+                ((Word.ApplicationEvents4_Event)application).DocumentOpen += ThisAddIn_NewDocument;
+                ((Word.ApplicationEvents4_Event)application).DocumentBeforeClose += OnCloseDocument;
             }
-            if (CustomTaskPanes.Count == 0)
+        }
+
+        private void OnCloseDocument(Word.Document document, ref bool cancel)
+        {
+            if (document != null)
             {
-                myCustomTaskPane = this.CustomTaskPanes.Add(_settingControl, "AI Assistant", this.Application.ActiveWindow);
-                myCustomTaskPane.DockPositionRestrict = MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoChange;              
+                Dictdocument.Remove(document);
+                Marshal.ReleaseComObject(document);
+            }
+        }
+
+        private void ThisAddIn_NewDocument(Word.Document Doc)
+        {
+            Word.Document document = Application.ActiveDocument;
+            ProcessSideBarPanel(document, false);
+        }
+
+        public void ProcessSideBarPanel(Word.Document document, bool isVisible)
+        {            
+            if (!Dictdocument.ContainsKey(document))
+            {
+                _settingControl = new SettingUserControl();                          
+                myCustomTaskPane = this.CustomTaskPanes.Add(_settingControl, AppConstant.AppTitle, document?.ActiveWindow);
+                myCustomTaskPane.DockPositionRestrict = MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoChange;
                 myCustomTaskPane.Width = 400;
+            }            
+            if (isVisible)
+            {
+                OnRefreshSidebarPanel?.Invoke();
             }
             myCustomTaskPane.Visible = isVisible;
-        }       
-
+            Dictdocument[document] = isVisible;
+        }
+       
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
-            customRibbonExplorer = new CustomRibbonExplorer();
-            return customRibbonExplorer;
+            return new CustomRibbonExplorer();            
         }
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {

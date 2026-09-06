@@ -23,6 +23,26 @@ namespace AssistantForWord.UI.Views
         public CustomPanelView()
         {
             InitializeComponent();
+            this.Loaded += OnCustomPanelViewLoaded;
+            Globals.ThisAddIn.OnRefreshSidebarPanel += OnRefreshSidebarPanel;
+        }
+
+        private void OnRefreshSidebarPanel()
+        {
+            RefreshValue();
+        }
+
+        private void OnCustomPanelViewLoaded(object sender, RoutedEventArgs e)
+        {
+            //RefreshValue();
+        }
+        internal void RefreshValue()
+        {
+            var model = this.DataContext as ViewModels.CustomPanelViewModel;
+            if (model != null)
+            {
+                model.LoadExistingData();
+            }
         }
     }
 }

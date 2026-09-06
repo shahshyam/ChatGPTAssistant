@@ -11,18 +11,18 @@ using System.Windows.Input;
 
 namespace AssistantForWord.UI.ViewModels
 {
-   public class CustomPanelViewModel:ViewModelBase
+    public class CustomPanelViewModel : ViewModelBase
     {
-        public ObservableCollection<PromptDetail> PromptList { get; set; }
-        private readonly CustomRibbonExplorer customRibbonExplorer;
+        public ObservableCollection<PromptViewModel> PromptList { get; set; }
+
         public CustomPanelViewModel()
         {
-            PromptList = new ObservableCollection<PromptDetail>();
-            customRibbonExplorer = Globals.ThisAddIn.customRibbonExplorer;
-            LoadExistingData();
+            PromptList = new ObservableCollection<PromptViewModel>();
         }
-        private void LoadExistingData()
+        internal void LoadExistingData()
         {
+            if (PromptList.Count > 0)
+                PromptList.Clear();
             var config = ProcessData.GetData();
             APIKey = config.APIKEY;
             AllowPrompt = !string.IsNullOrEmpty(APIKey);
@@ -31,7 +31,14 @@ namespace AssistantForWord.UI.ViewModels
             SelectedModelName = config.ModelName;
             foreach (var prompt in config.PromptDetailList)
             {
-                PromptList.Add(prompt);
+                PromptList.Add(new PromptViewModel()
+                {
+                    Description = prompt.Description,
+                    Title = prompt.Title,
+                    Id = prompt.Id,
+                    PromptName = prompt.Name
+                }
+                );
             }
         }
         #region API Setting
@@ -39,7 +46,9 @@ namespace AssistantForWord.UI.ViewModels
         public string APIKey
         {
             get { return apiKey; }
-            set { apiKey = value;
+            set
+            {
+                apiKey = value;
                 OnPropertyChanged();
             }
         }
@@ -48,7 +57,9 @@ namespace AssistantForWord.UI.ViewModels
         public string SelectedModelName
         {
             get { return selectedModelName; }
-            set { selectedModelName = value;
+            set
+            {
+                selectedModelName = value;
                 OnPropertyChanged();
             }
         }
@@ -57,7 +68,9 @@ namespace AssistantForWord.UI.ViewModels
         public int TokenSize
         {
             get { return tokenSize; }
-            set { tokenSize = value;
+            set
+            {
+                tokenSize = value;
                 OnPropertyChanged();
             }
         }
@@ -66,7 +79,9 @@ namespace AssistantForWord.UI.ViewModels
         public double Temperature
         {
             get { return temperature; }
-            set { temperature = value;
+            set
+            {
+                temperature = value;
                 OnPropertyChanged();
             }
         }
@@ -87,6 +102,9 @@ namespace AssistantForWord.UI.ViewModels
                 {
                     var config = ProcessData.GetData();
                     config.APIKEY = this.APIKey;
+                    config.Temperature = Temperature;
+                    config.ModelName = SelectedModelName;
+                    config.TokenSize = TokenSize;
                     ProcessData.SaveData(config);
                     AllowPrompt = true;
                 }, y => { return !string.IsNullOrEmpty(APIKey); }
@@ -98,36 +116,61 @@ namespace AssistantForWord.UI.ViewModels
         public bool AllowPrompt
         {
             get { return allowPrompt; }
-            set { allowPrompt = value;
+            set
+            {
+                allowPrompt = value;
                 OnPropertyChanged();
             }
         }
 
         #endregion
         #region PROMPT
-        private string title;
-        public string Title
+
+        private PromptViewModel newPromptDetail = new PromptViewModel();
+        public PromptViewModel NewPromptDetail
         {
-            get { return title; }
-            set { title = value;
-                OnPropertyChanged();
-            }
-        }
-        private string description;
-        public string Description
-        {
-            get { return description; }
-            set { description = value;
+            get { return newPromptDetail; }
+            set
+            {
+                newPromptDetail = value;
                 OnPropertyChanged();
             }
         }
 
-        private PromptDetail selectedPromptDetail;
-        public PromptDetail SelectedPromptDetail
+        private PromptViewModel selectedPromptDetail;
+        public PromptViewModel SelectedPromptDetail
         {
             get { return selectedPromptDetail; }
-            set { selectedPromptDetail = value;
+            set
+            {
+                selectedPromptDetail = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool isExpand = false;
+        public bool IsExpand
+        {
+            get { return isExpand; }
+            set
+            {
+                isExpand = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public OperationMode Mode = OperationMode.Add;
+        private ICommand editPromptCommand;
+        public ICommand EditPromptCommand
+        {
+            get
+            {
+                return editPromptCommand ?? (editPromptCommand = new RelayCommand((x) =>
+                {
+                    NewPromptDetail = SelectedPromptDetail;
+                    Mode = OperationMode.Edit;
+                    IsExpand = true;
+                }));
             }
         }
 
@@ -138,18 +181,48 @@ namespace AssistantForWord.UI.ViewModels
             {
                 return savePromptCommand ?? (savePromptCommand = new RelayCommand((x) =>
                 {
-                    var proptdetail = new PromptDetail()
+                    if (Mode == OperationMode.Edit)
                     {
-                        Description = this.Description,
-                        Title = this.Title
-                    };
-                    PromptList.Add(proptdetail);
-                    Description = string.Empty;
-                    Title = string.Empty;
-                    var config = ProcessData.GetData();
-                    config.PromptDetailList.Add(proptdetail);
-                    ProcessData.SaveData(config);                    
-                }, y => { return !string.IsNullOrEmpty(Title) && !string.IsNullOrEmpty(Description); }
+                        Guid id = SelectedPromptDetail.Id;
+                        var selectedItem = PromptList.FirstOrDefault(y => y.Id == id);
+
+                        selectedItem = NewPromptDetail;
+                        var config = ProcessData.GetData();
+                        int index = config.PromptDetailList.FindIndex(z => z.Id == id);
+                        if (index > -1)
+                        {
+                            config.PromptDetailList[index].Title = NewPromptDetail.Title;
+                            config.PromptDetailList[index].Description = NewPromptDetail.Description;
+                            config.PromptDetailList[index].Name = NewPromptDetail.PromptName;
+                            ProcessData.SaveData(config);
+                        }
+                        IsExpand = false;
+                        SelectedPromptDetail = null;
+                    }
+                    else
+                    {
+                        var proptdetail = new PromptDetail()
+                        {
+                            Description = NewPromptDetail.Description,
+                            Title = NewPromptDetail.Title,
+                            Id = NewPromptDetail.Id,
+                            Name = NewPromptDetail.PromptName
+                        };
+                        PromptList.Add(NewPromptDetail);
+                        var config = ProcessData.GetData();
+                        config.PromptDetailList.Add(proptdetail);
+                        ProcessData.SaveData(config);
+                    }
+                    NewPromptDetail = new PromptViewModel();
+                    Mode = OperationMode.Add;
+                }, y =>
+                {
+                    return (NewPromptDetail != null &&
+              !string.IsNullOrEmpty(NewPromptDetail.Title)
+              && !string.IsNullOrEmpty(NewPromptDetail.Description)
+              && !string.IsNullOrEmpty(NewPromptDetail.PromptName)
+              );
+                }
                 ));
             }
         }
@@ -160,23 +233,26 @@ namespace AssistantForWord.UI.ViewModels
             {
                 return deletePromptCommand ?? (deletePromptCommand = new RelayCommand((param) =>
                 {
-                    if (SelectedPromptDetail != null)
-                    {                               
+                    if (Mode == OperationMode.Add && SelectedPromptDetail != null)
+                    {
                         var config = ProcessData.GetData();
-                        int index=config.PromptDetailList.FindIndex(x => x.Title == SelectedPromptDetail.Title && x.Description == SelectedPromptDetail.Description);
+                        int index = config.PromptDetailList.FindIndex(x => x.Id == SelectedPromptDetail.Id);
                         if (index > -1)
                         {
                             config.PromptDetailList.RemoveAt(index);
                             ProcessData.SaveData(config);
                         }
-                       
-                        PromptList.Remove(SelectedPromptDetail);                       
-                        customRibbonExplorer.InvalidateControl("mainAssitant");
+                        PromptList.Remove(SelectedPromptDetail);
                     }
                 }
                 ));
             }
         }
         #endregion
+    }
+    public enum OperationMode
+    {
+        Edit,
+        Add
     }
 }

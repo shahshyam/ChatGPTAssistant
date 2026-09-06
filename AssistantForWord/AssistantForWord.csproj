@@ -137,6 +137,9 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Primitives.2.1.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
@@ -186,9 +189,6 @@
     <Reference Include="Microsoft.Office.Tools.v4.0.Framework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Microsoft.Office.Tools, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
@@ -236,6 +236,8 @@
     <Compile Include="UI\Commands\EventArgs.cs" />
     <Compile Include="UI\Commands\EventRaiser.cs" />
     <Compile Include="UI\Commands\RelayCommand.cs" />
+    <Compile Include="UI\Helpers\AppConstant.cs" />
+    <Compile Include="UI\Helpers\PasswordBoxHelper.cs" />
     <Compile Include="UI\Models\PromptDetail.cs" />
     <Compile Include="UI\SaveOption\AssistantConfig.cs" />
     <Compile Include="UI\SaveOption\ProcessData.cs" />
@@ -246,6 +248,7 @@
       <DependentUpon>SettingUserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\ViewModels\CustomPanelViewModel.cs" />
+    <Compile Include="UI\ViewModels\PromptViewModel.cs" />
     <Compile Include="UI\ViewModels\ViewModelBase.cs" />
     <Compile Include="UI\Views\CustomPanelView.xaml.cs">
       <DependentUpon>CustomPanelView.xaml</DependentUpon>
@@ -265,7 +268,7 @@
       <DependentUpon>SettingUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="AssistantForWord_TemporaryKey.pfx" />
+    <None Include="AssistantForWord_1_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -290,12 +293,23 @@
   <ItemGroup>
     <EmbeddedResource Include="CustomRibbonExplorer.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\window-gear.png" />
+  </ItemGroup>
   <ItemGroup>
     <Page Include="UI\Views\CustomPanelView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\replace.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pointer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\button-angle-right.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -305,10 +319,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>AssistantForWord_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>AssistantForWord_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>12B37C26D03521AD6585ED8FA9C4960504F071C8</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>F9BF87271FB51CB38EE2262244341A82C0BA7327</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
