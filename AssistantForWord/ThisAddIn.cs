@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
+﻿using System.Collections.Generic;
 using Word = Microsoft.Office.Interop.Word;
-using Office = Microsoft.Office.Core;
 using AssistantForWord.UI;
 using Microsoft.Office.Core;
 using System.Runtime.InteropServices;
@@ -26,9 +21,18 @@ namespace AssistantForWord
             if (application != null)
             {
                 ((Word.ApplicationEvents4_Event)application).NewDocument += ThisAddIn_NewDocument;
-                ((Word.ApplicationEvents4_Event)application).DocumentOpen += ThisAddIn_NewDocument;
-                ((Word.ApplicationEvents4_Event)application).DocumentBeforeClose += OnCloseDocument;
+                application.DocumentOpen += ThisAddIn_NewDocument;
+                application.DocumentBeforeClose += OnCloseDocument;
+                ((Word.ApplicationEvents4_Event)application).Quit += ThisAddIn_Quit; ;
             }
+        }
+
+        private void ThisAddIn_Quit()
+        {
+            ((Word.ApplicationEvents4_Event)application).NewDocument -= ThisAddIn_NewDocument;
+            application.DocumentOpen -= ThisAddIn_NewDocument;
+            application.DocumentBeforeClose -= OnCloseDocument;
+            ((Word.ApplicationEvents4_Event)application).Quit -= ThisAddIn_Quit;
         }
 
         private void OnCloseDocument(Word.Document document, ref bool cancel)
@@ -42,8 +46,22 @@ namespace AssistantForWord
 
         private void ThisAddIn_NewDocument(Word.Document Doc)
         {
-            Word.Document document = Application.ActiveDocument;
-            ProcessSideBarPanel(document, false);
+            Word.Document document = null;
+            if (Application.Documents.Count > 0)
+            {
+                document = Application.ActiveDocument;
+            }
+
+            if (document == null)
+            {
+                document = Doc; // fallback to event document
+            }
+
+            if (document != null)
+            {
+                ProcessSideBarPanel(document, false);
+            }
+            // else: no document available — skip or log
         }
 
         public void ProcessSideBarPanel(Word.Document document, bool isVisible)
